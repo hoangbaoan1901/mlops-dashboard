@@ -1,0 +1,10 @@
+model MLModel {
+    modelId        String  @unique
+    experimentId   String
+    RunId          String
+    modelName      String
+    kserveEndpoint String  @unique
+    author         User    @relation(fields: [authorId], references: [id])
+    authorId       String
+    token          String?
+}
