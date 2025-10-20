@@ -8,6 +8,8 @@ class UserService {
     private userSecretLength = 16;
 
     async createUser(username: string, email: string) {
+        // Return the JSON with user_id
+
         // Generate a random hex string for secret
         const byteLength = Math.ceil(
             this.userSecretLength % 2 === 0
@@ -43,6 +45,7 @@ class UserService {
     }
 
     async deleteUser(username: string | null, email: string | null) {
+        // Return true if deleted successfully
         try {
             if (username !== null) {
                 await prismaClientInstance.user.delete({
@@ -57,6 +60,7 @@ class UserService {
                             email: email,
                         },
                     });
+                    return true;
                 } else {
                     throw new Error(
                         "Either username or email must be provided"
@@ -70,13 +74,14 @@ class UserService {
     }
 
     async getUserSecret(username: string | null, email: string | null) {
+        // Return directly the secret (no JSON)
         try {
             const user = await prismaClientInstance.user.findFirst({
                 where: {
                     OR: [{ username: username }, { email: email }],
                 },
             });
-            return user?.secret || null;
+            return user?.secret || null; 
         } catch (error) {
             console.log(error.message);
             throw error;
@@ -84,6 +89,7 @@ class UserService {
     }
 
     async getOrCreateUser(username: string | null, email: string | null) {
+        // Return JSON with user_id
         try {
             const user = await prismaClientInstance.user.findFirst({
                 where: {

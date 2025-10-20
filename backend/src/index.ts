@@ -21,6 +21,9 @@ app.options("/", cors());
 app.use("/users", userRouter);
 app.use("/workspaces", workspaceRouter);
 
+app.get("/", (req, res) => {
+    res.send("MLOps Dashboard Backend is running");
+});
 app.listen(3000, function () {
     console.log("App listening on port 3000");
 });

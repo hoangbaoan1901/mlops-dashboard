@@ -6,7 +6,6 @@ import { workspaceSchema } from "./workspaceValidator";
 
 class WorkspaceController {
     private workspaceServiceInstance = workspaceServiceInstance;
-    private userServiceInstance = userServiceInstance;
     private authServiceInstance = userKeycloakAuthServiceInstance;
 
     // Get workspaces
@@ -40,7 +39,7 @@ class WorkspaceController {
             const newWorkspace =
                 await this.workspaceServiceInstance.createWorkspace(
                     userInfo.username,
-                    body.workspaceName,
+                    body.workspace_name,
                     {
                         num_cpu: body.num_cpu,
                         memory: body.memory,
@@ -62,8 +61,8 @@ class WorkspaceController {
             const userInfo = (await this.authServiceInstance.getUserInfo(
                 token
             )) as { username: string; email: string };
-            const workspaceId = req.params.id;
-            const action = req.params.action as "start" | "stop" | "delete";
+            const workspaceId = req.body.workspace_id;
+            const action = req.body.action as "start" | "stop" | "delete";
             await this.workspaceServiceInstance.buildWorkspace(
                 workspaceId,
                 action
@@ -111,9 +110,14 @@ class WorkspaceController {
             if (!coderSecret) {
                 return res.status(403).send("User secret not found");
             }
-            const coderBaseURL = process.env.CODER_BASE_URL;
-            const coderAppUrl = `${coderBaseURL}/@${userInfo.username}/${workspace}.main/apps/${appName}`;
-            const coderDomain = new URL(coderBaseURL).hostname;
+            const coderAppUrl = `${process.env.CODER_BASE_URL}/@${userInfo.username}/${workspace}.main/apps/${appName}`;
+            const coderDomain = new URL(process.env.CODER_BASE_URL).hostname;
+            const coderTokenRequest =
+                await this.workspaceServiceInstance.getCoderSessionToken(
+                    userInfo.email,
+                    coderSecret
+                );
+            const tokenData = coderTokenRequest.session_token;
             console.log(`Redirecting to Coder app: ${coderAppUrl}`);
             console.log(
                 `Setting coder_session_token cookie for domain: ${coderDomain}`
@@ -121,7 +125,7 @@ class WorkspaceController {
 
             // Set the Coder session cookie
             // The cookie needs to be set for the Coder domain
-            res.cookie("coder_session_token", coderSecret, {
+            res.cookie("coder_session_token", tokenData, {
                 domain: coderDomain === "localhost" ? "localhost" : coderDomain,
             });
 

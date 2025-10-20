@@ -29,6 +29,7 @@ class workspaceService {
      * @returns coder session token in JSON format
      */
     async getCoderSessionToken(email: string, password: string) {
+        // Return session token in JSON format
         const payload = { email: email, password: password };
         const endpoint = "/users/login";
         try {
@@ -67,7 +68,7 @@ class workspaceService {
                 this.adminEmail,
                 this.adminPassword
             );
-            this.adminToken = tokenRequest.session_token;
+            this.adminToken = tokenRequest.session_token; // Extract the token
             console.log(`Admin Token: ${this.adminToken}`);
         } catch (error) {
             console.log(error.message);
@@ -102,6 +103,7 @@ class workspaceService {
     }
 
     async getTemplates() {
+        // Return all list templates, each stored in JSON
         const endpoint = "/templates";
         // Ensure token is available
         await this.ensureValidAdminToken();
@@ -123,8 +125,8 @@ class workspaceService {
         }
     }
 
-    async getLatestTemplateID() {
-        // Ensure token is available
+    private async getLatestTemplateID() {
+        // return the latest template ID
         await this.ensureValidAdminToken();
         try {
             const templates = await this.getTemplates();
@@ -139,7 +141,7 @@ class workspaceService {
         }
     }
 
-    async getLatestTemplateActiveID() {
+    private async getLatestTemplateActiveID() {
         try {
             const templates = await this.getTemplates();
             const templateLength = templates.length;
@@ -157,8 +159,9 @@ class workspaceService {
      * Get all user's workspaces.
      */
     async getWorkspaces(username: string) {
+        // Return list of workspaces owned by the username, each stored in JSON
+
         console.log(this.adminToken);
-        // Ensure token is available
         await this.ensureValidAdminToken();
         const endpoint = "/workspaces";
         const query = `owner:${username}`;
@@ -173,7 +176,7 @@ class workspaceService {
                     },
                 }
             );
-            return workspacesResponse.data.workspaces;
+            return workspacesResponse.data.workspaces; // Return the list of workspaces
         } catch (error) {
             console.error("Error fetching workspaces:", error);
             throw new Error("Failed to fetch workspaces");
@@ -212,7 +215,8 @@ class workspaceService {
      *
      */
     async getWorkspaceOwnerUsername(workspaceID: string) {
-        // Ensure token is available
+        // Return the workspace owner's username
+
         await this.ensureValidAdminToken();
         try {
             const workspaceMetadata = await this.getWorkspaceMetadata(
@@ -230,7 +234,7 @@ class workspaceService {
      * This one is for starting, stopping and deleting a workspace.
      */
     async buildWorkspace(workspaceID: string, action: buildAction) {
-        // Ensure token is available
+        // Return the workspace states in JSON
         await this.ensureValidAdminToken();
         const endpoint = `/workspaces/${workspaceID}/builds`;
         try {

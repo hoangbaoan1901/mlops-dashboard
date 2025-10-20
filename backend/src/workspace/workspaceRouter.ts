@@ -18,7 +18,7 @@ workspaceRouter.post("/", (req, res) =>
 );
 
 // Route to build (start, stop, delete) a workspace
-workspaceRouter.post("/:workspaceId/:action", (req, res) =>
+workspaceRouter.post("/build", (req, res) =>
     workspaceController.buildWorkspace(req, res)
 );
 
