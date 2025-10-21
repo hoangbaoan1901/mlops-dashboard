@@ -1,6 +1,6 @@
 Begin test
 Getting templates...
-Admin Token: 4tc5HdWcwd-BW9fxnrWvYfcQpVzGEANMj
+Admin Token: l5zI1kHzbi-wUM4l3dkoUhl97Cl5VrjuR
 [
   {
     id: '1ca1b3f3-22ca-435b-a503-11f63886eed6',
@@ -40,7 +40,7 @@ Admin Token: 4tc5HdWcwd-BW9fxnrWvYfcQpVzGEANMj
 ]
 ================================
 Getting workspaces...
-4tc5HdWcwd-BW9fxnrWvYfcQpVzGEANMj
+l5zI1kHzbi-wUM4l3dkoUhl97Cl5VrjuR
 [
   {
     id: '34f509fe-14ca-48ea-a78d-eb6e1f0bf11c',
@@ -89,7 +89,7 @@ Getting workspaces...
     outdated: false,
     name: 'workspace1',
     ttl_ms: 86400000,
-    last_used_at: '2025-10-20T11:36:31.097079Z',
+    last_used_at: '2025-10-20T13:21:46.637594Z',
     deleting_at: null,
     dormant_at: null,
     health: { healthy: true, failing_agents: [] },
@@ -117,23 +117,23 @@ Getting workspaces...
     template_require_active_version: false,
     template_use_classic_parameter_flow: false,
     latest_build: {
-      id: 'a8bfa717-da10-496d-a117-3e003d81971e',
-      created_at: '2025-10-20T11:32:46.062602Z',
-      updated_at: '2025-10-20T11:33:01.218717Z',
+      id: '381dbfbb-1515-4a37-be2e-699117ef04c7',
+      created_at: '2025-10-20T11:37:23.655192Z',
+      updated_at: '2025-10-20T11:37:39.701355Z',
       workspace_id: '493c91e9-4158-4810-9dc7-6381132d3b18',
       workspace_name: 'aqua-harrier-96',
       workspace_owner_id: '57c81a07-c841-47e4-a300-e7845a8ab259',
       workspace_owner_name: 'admin',
       template_version_id: '2b7afb21-d376-43a6-9182-cc869bc514ca',
       template_version_name: 'friendly_kalam4',
-      build_number: 2,
+      build_number: 3,
       transition: 'stop',
       initiator_id: '57c81a07-c841-47e4-a300-e7845a8ab259',
       initiator_name: 'admin',
       job: [Object],
       reason: 'initiator',
       resources: [Array],
-      deadline: '2025-10-21T11:33:01.218717Z',
+      deadline: '2025-10-21T11:37:39.701355Z',
       max_deadline: null,
       status: 'stopped',
       daily_cost: 0,
@@ -158,53 +158,3 @@ Getting workspaces...
   }
 ]
 ================================
-Stopping workspace...
-{
-  id: '381dbfbb-1515-4a37-be2e-699117ef04c7',
-  created_at: '2025-10-20T11:37:23.655192Z',
-  updated_at: '2025-10-20T11:37:23.655192Z',
-  workspace_id: '493c91e9-4158-4810-9dc7-6381132d3b18',
-  workspace_name: 'aqua-harrier-96',
-  workspace_owner_id: '57c81a07-c841-47e4-a300-e7845a8ab259',
-  workspace_owner_name: 'admin',
-  template_version_id: '2b7afb21-d376-43a6-9182-cc869bc514ca',
-  template_version_name: '',
-  build_number: 3,
-  transition: 'stop',
-  initiator_id: '57c81a07-c841-47e4-a300-e7845a8ab259',
-  initiator_name: 'admin',
-  job: {
-    id: '292d80e1-e7cc-4129-9756-cf202da89154',
-    created_at: '2025-10-20T11:37:23.655192Z',
-    status: 'pending',
-    file_id: '57e8dc63-1bee-43b7-bdd3-6a0f54391b04',
-    tags: { owner: '', scope: 'organization' },
-    queue_position: 0,
-    queue_size: 0,
-    organization_id: '33c880ac-f7d2-400f-b9b8-7253de9a846a',
-    input: { workspace_build_id: '381dbfbb-1515-4a37-be2e-699117ef04c7' },
-    type: 'workspace_build',
-    metadata: {
-      template_version_name: '',
-      template_id: '00000000-0000-0000-0000-000000000000',
-      template_name: '',
-      template_display_name: '',
-      template_icon: ''
-    },
-    logs_overflowed: false
-  },
-  reason: 'initiator',
-  resources: [],
-  deadline: null,
-  max_deadline: null,
-  status: 'pending',
-  daily_cost: 0,
-  matched_provisioners: {
-    count: 3,
-    available: 3,
-    most_recently_seen: '2025-10-20T11:36:38.422099Z'
-  },
-  template_version_preset_id: null
-}
-================================
-Starting workspace...

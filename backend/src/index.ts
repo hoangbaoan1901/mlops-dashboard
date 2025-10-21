@@ -3,8 +3,11 @@ import cors from "cors";
 import "dotenv/config";
 import userRouter from "./user/userRouter";
 import workspaceRouter from "./workspace/workspaceRouter";
+import morgan from "morgan";
 
 const app = express();
+app.use(express.json());
+app.use(morgan("dev"));
 
 // Enable CORS
 app.use(

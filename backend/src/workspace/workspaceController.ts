@@ -35,6 +35,7 @@ class WorkspaceController {
                 token
             )) as { username: string; email: string };
             const body = req.body;
+            console.log(`req.body.workspace_name: ${body.workspace_name}`);
             await workspaceSchema.validateAsync(body);
             const newWorkspace =
                 await this.workspaceServiceInstance.createWorkspace(
@@ -49,7 +50,7 @@ class WorkspaceController {
                 );
             res.status(201).json(newWorkspace);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ error: error.message, from: "controller" });
         }
     }
 
@@ -103,38 +104,126 @@ class WorkspaceController {
             }
 
             // Get session token and base URL from environment
+            console.log(
+                `Getting secret for user: ${userInfo.username}, email: ${userInfo.email}`
+            );
             const coderSecret = await userServiceInstance.getUserSecret(
                 userInfo.username,
                 userInfo.email
             );
+            console.log(
+                `Coder secret retrieved: ${coderSecret ? "Yes" : "No"}`
+            );
             if (!coderSecret) {
                 return res.status(403).send("User secret not found");
             }
-            const coderAppUrl = `${process.env.CODER_BASE_URL}/@${userInfo.username}/${workspace}.main/apps/${appName}`;
-            const coderDomain = new URL(process.env.CODER_BASE_URL).hostname;
+
+            // Use CODER_BASE_URL with fallback like in the working implementation
+            const CODER_BASE_URL = process.env.CODER_BASE_URL || process.env.CODER_URL || "http://localhost:30100";
+            console.log(`Using Coder base URL: ${CODER_BASE_URL}`);
+
+            const coderAppUrl = `${CODER_BASE_URL}/@${userInfo.username}/${workspace}.main/apps/${appName}`;
+            console.log(`Constructed coderAppUrl: ${coderAppUrl}`);
+
+            // Parse domain from URL
+            const coderDomain = new URL(CODER_BASE_URL).hostname;
+            console.log(`Extracted coderDomain: ${coderDomain}`);
+
+            console.log(
+                `Requesting Coder session token for email: ${userInfo.email}`
+            );
             const coderTokenRequest =
                 await this.workspaceServiceInstance.getCoderSessionToken(
                     userInfo.email,
                     coderSecret
                 );
+            console.log(
+                "Coder token request response:",
+                JSON.stringify(coderTokenRequest)
+            );
+
+            if (!coderTokenRequest || !coderTokenRequest.session_token) {
+                console.error(
+                    "No session token returned from getCoderSessionToken"
+                );
+                return res
+                    .status(500)
+                    .send("Failed to obtain Coder session token");
+            }
+
             const tokenData = coderTokenRequest.session_token;
             console.log(`Redirecting to Coder app: ${coderAppUrl}`);
             console.log(
                 `Setting coder_session_token cookie for domain: ${coderDomain}`
             );
-
-            // Set the Coder session cookie
-            // The cookie needs to be set for the Coder domain
-            res.cookie("coder_session_token", tokenData, {
-                domain: coderDomain === "localhost" ? "localhost" : coderDomain,
+            // Log detailed information about the request and the cookie we're setting
+            console.log("Request host:", req.headers.host);
+            console.log("Request origin:", req.headers.origin);
+            console.log("Request referer:", req.headers.referer);
+            
+            // Cookie options for debugging
+            const cookieOptions = {
+                // Test without specifying domain first
+                path: "/",
+                httpOnly: false,
+                secure: false,
+                sameSite: "lax" as "lax" | "none" | "strict",
+            };
+            
+            console.log("Setting cookie with options:", JSON.stringify(cookieOptions));
+            console.log("Token data length:", tokenData?.length || 0);
+            
+            // Set the cookie with logging
+            res.cookie("coder_session_token", tokenData, cookieOptions);
+            
+            // Log all response headers being set
+            console.log("Response headers:", res.getHeaders());
+            
+            // EXPERIMENTAL: Try setting the cookie again with different approaches
+            // 1. Try setting with coderDomain
+            console.log("Setting cookie with coderDomain:", coderDomain);
+            res.cookie("coder_session_token_test1", tokenData.substring(0, 10), {
+                domain: coderDomain,
+                path: "/",
+                httpOnly: false,
+                secure: false,
+                sameSite: "none"
             });
-
-            // Redirect to the Coder app
-            res.redirect(coderAppUrl);
+            
+            // 2. Try with wildcard domain (for subdomains)
+            const wildcardDomain = coderDomain.includes('.')
+                ? `.${coderDomain.split('.').slice(-2).join('.')}`
+                : coderDomain;
+            console.log("Setting cookie with wildcardDomain:", wildcardDomain);
+            res.cookie("coder_session_token_test2", tokenData.substring(0, 10), {
+                domain: wildcardDomain,
+                path: "/",
+                httpOnly: false,
+                secure: false,
+                sameSite: "none"
+            });
+            
+            // Return success to the frontend - we won't redirect
+            res.status(200).json({ 
+                success: true,
+                message: "Coder session cookie set",
+                url: coderAppUrl,
+                token: tokenData,
+                cookieDomain: coderDomain
+            });
         } catch (error) {
             console.error("Error in accessWorkspaceApp endpoint:", error);
+            console.error(
+                "Error details:",
+                JSON.stringify({
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name,
+                })
+            );
             res.status(500).send(
-                "Internal server error while accessing workspace app"
+                "Internal server error while accessing workspace app: " +
+                    error.message
             );
         }
     }

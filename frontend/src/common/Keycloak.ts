@@ -2,9 +2,9 @@ import Keycloak from "keycloak-js";
 
 async function initializeKeycloak() {
     const keycloak = new Keycloak({
-        url: "http://localhost:30080",
-        realm: "disops",
-        clientId: "test",
+        url: `${import.meta.env.VITE_KEYCLOAK_URL}`,
+        realm: `${import.meta.env.VITE_KEYCLOAK_REALM}`,
+        clientId: `${import.meta.env.VITE_KEYCLOAK_CLIENTID}`,
     });
     try {
         await keycloak.init({

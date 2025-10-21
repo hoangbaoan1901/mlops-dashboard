@@ -14,3 +14,5 @@
     Request body:
   - workspace_id (string): workspace ID
   - action: start | stop | delete
+
+- GET: `

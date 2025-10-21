@@ -22,4 +22,9 @@ workspaceRouter.post("/build", (req, res) =>
     workspaceController.buildWorkspace(req, res)
 );
 
+// Route to redirect to workspace URL
+workspaceRouter.get("/coderapp/:workspace/:appName", (req, res) =>
+    workspaceController.accessWorkspaceApp(req, res)
+);
+
 export default workspaceRouter;
