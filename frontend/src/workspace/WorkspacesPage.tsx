@@ -529,7 +529,7 @@ function WorkspacesPage() {
                             mb: 3,
                         }}
                     >
-                        <Typography variant="h5">Workspaces</Typography>
+                        <Typography variant="h5">Các không gian làm việc</Typography>
                         <Box>
                             <Tooltip title="Refresh workspaces">
                                 <IconButton
@@ -545,7 +545,7 @@ function WorkspacesPage() {
                                 startIcon={<AddIcon />}
                                 onClick={() => navigate("/workspaces/new")}
                             >
-                                Create Workspace
+                                Không gian làm việc mới
                             </Button>
                         </Box>
                     </Box>

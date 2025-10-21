@@ -90,7 +90,7 @@ function UserInfoPage() {
                                 <Box sx={{ width: { xs: "100%", sm: "50%" } }}>
                                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                                         <FingerprintIcon sx={{ mr: 1 }} color="primary" />
-                                        <Typography variant="body1" sx={{ fontWeight: "500" }}>User ID:</Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: "500" }}>ID: </Typography>
                                     </Box>
                                     <Typography variant="body2" sx={{ ml: 4, wordBreak: "break-all" }}>
                                         {tokenParsed?.sub || "Unknown ID"}
@@ -102,7 +102,7 @@ function UserInfoPage() {
                                 <Box sx={{ width: { xs: "100%", sm: "50%" } }}>
                                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                                         <GroupsIcon sx={{ mr: 1 }} color="primary" />
-                                        <Typography variant="body1" sx={{ fontWeight: "500" }}>Roles:</Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: "500" }}>Quyền:</Typography>
                                     </Box>
                                     <Box sx={{ ml: 4 }}>
                                         {tokenParsed?.realm_access?.roles ? (
@@ -125,14 +125,14 @@ function UserInfoPage() {
                                 <Box sx={{ width: { xs: "100%", sm: "50%" } }}>
                                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                                         <AccessTimeIcon sx={{ mr: 1 }} color="primary" />
-                                        <Typography variant="body1" sx={{ fontWeight: "500" }}>Session Info:</Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: "500" }}>Thông tin phiên:</Typography>
                                     </Box>
                                     <Box sx={{ ml: 4 }}>
                                         <Typography variant="body2">
-                                            <strong>Issued at:</strong> {tokenParsed?.iat ? formatDate(tokenParsed.iat) : "Unknown"}
+                                            <strong>Được cấp vào:</strong> {tokenParsed?.iat ? formatDate(tokenParsed.iat) : "Unknown"}
                                         </Typography>
                                         <Typography variant="body2">
-                                            <strong>Expires:</strong> {tokenParsed?.exp ? formatDate(tokenParsed.exp) : "Unknown"}
+                                            <strong>Hết hạn vào:</strong> {tokenParsed?.exp ? formatDate(tokenParsed.exp) : "Unknown"}
                                         </Typography>
                                     </Box>
                                 </Box>

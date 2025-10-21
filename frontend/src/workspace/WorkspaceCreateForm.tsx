@@ -163,7 +163,7 @@ const WorkspaceCreateForm = () => {
             <Card elevation={3}>
                 <CardContent>
                     <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>
-                        Create New Workspace
+                        Tạo không gian làm việc mới
                     </Typography>
 
                     {submitError && (
@@ -348,7 +348,7 @@ const WorkspaceCreateForm = () => {
 
                             <Box>
                                 <TextField
-                                    label="GitHub Token (Mandatory)"
+                                    label="GitHub Token (Bắt buộc)"
                                     variant="outlined"
                                     fullWidth
                                     value={formData.github_token}
@@ -356,7 +356,7 @@ const WorkspaceCreateForm = () => {
                                     error={!!errors.github_token}
                                     helperText={
                                         errors.github_token ||
-                                        "Provide a GitHub personal access token for Git operations within your workspace"
+                                        "Tạo Github PAT tại `https://github.com/settings/tokens/new`"
                                     }
                                     InputProps={{
                                         startAdornment: (

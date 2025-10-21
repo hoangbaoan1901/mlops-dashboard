@@ -80,7 +80,7 @@ function App() {
                     <Container maxWidth={false} sx={{ width: '100%' }}>
                         <Toolbar disableGutters sx={{ width: '100%', justifyContent: 'space-between' }}>
                             <Typography variant="h6" component="div">
-                                MLOps Dashboard
+                                Workspace Manager
                             </Typography>
                             
                             {/* Navigation buttons */}

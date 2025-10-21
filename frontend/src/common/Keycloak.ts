@@ -13,22 +13,6 @@ async function initializeKeycloak() {
             pkceMethod: "S256",
             flow: "standard",
         });
-        keycloak.onTokenExpired = () => {
-            console.log("Token expired, refreshing...");
-            keycloak
-                .updateToken(30)
-                .then((refreshed) => {
-                    if (refreshed) {
-                        console.log("Token refreshed");
-                    } else {
-                        console.log("Token still valid");
-                    }
-                })
-                .catch(() => {
-                    console.error("Failed to refresh token");
-                    keycloak.login();
-                });
-        };
         return keycloak;
     } catch (error) {
         console.error("Failed to initialize Keycloak", error);
