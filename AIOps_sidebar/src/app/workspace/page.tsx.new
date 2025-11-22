@@ -1,0 +1,337 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  FiPlay,
+  FiSave,
+  FiPlus,
+  FiFolder,
+  FiFile,
+  FiTerminal
+} from "react-icons/fi";
+import { SiJupyter, SiApacheparquet } from "react-icons/si";
+import { VscJson } from "react-icons/vsc";
+import { BiData } from "react-icons/bi";
+
+export default function WorkspacePage() {
+  const [activeTab, setActiveTab] = useState("notebook");
+  const [notebooks, setNotebooks] = useState([
+    {
+      key: "notebook1",
+      title: "Notebook mới",
+      content: '# Notebook Python\nprint("Xin chào DataBricks!")'
+    }
+  ]);
+  const [activeNotebook, setActiveNotebook] = useState("notebook1");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [newNotebookName, setNewNotebookName] = useState("");
+  const [user, setUser] = useState<any>(null);
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(["workspace", "notebooks", "datasets"]));
+  const [selectedFile, setSelectedFile] = useState("analysis.ipynb");
+  const router = useRouter();
+
+  const folderStructure = {
+    workspace: {
+      name: "Không gian làm việc",
+      type: "folder",
+      children: {
+        notebooks: {
+          name: "Notebooks",
+          type: "folder",
+          children: {
+            "analysis.ipynb": {
+              name: "Phân tích dữ liệu.ipynb",
+              type: "notebook"
+            },
+            "ml.ipynb": { name: "Machine Learning.ipynb", type: "notebook" },
+            "visualization.ipynb": {
+              name: "Trực quan hóa.ipynb",
+              type: "notebook"
+            }
+          }
+        },
+        datasets: {
+          name: "Datasets",
+          type: "folder",
+          children: {
+            "sales_data.csv": { name: "sales_data.csv", type: "csv" },
+            "customer_info.json": { name: "customer_info.json", type: "json" },
+            "product_catalog.parquet": {
+              name: "product_catalog.parquet",
+              type: "parquet"
+            }
+          }
+        },
+        models: {
+          name: "Models",
+          type: "folder",
+          children: {
+            "regression_model.pkl": {
+              name: "regression_model.pkl",
+              type: "model"
+            },
+            "classification_model.joblib": {
+              name: "classification_model.joblib",
+              type: "model"
+            }
+          }
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    } else {
+      router.push("/auth/login");
+    }
+  }, [router]);
+
+  const handleRunCode = () => {
+    console.log("Running code...");
+  };
+
+  const toggleFolder = (path: string) => {
+    const newExpanded = new Set(expandedFolders);
+    if (newExpanded.has(path)) {
+      newExpanded.delete(path);
+    } else {
+      newExpanded.add(path);
+    }
+    setExpandedFolders(newExpanded);
+  };
+
+  const getFileIcon = (type: string) => {
+    switch (type) {
+      case "folder":
+        return <FiFolder className="text-yellow-500" />;
+      case "notebook":
+        return <SiJupyter className="text-orange-500" />;
+      case "csv":
+        return <BiData className="text-green-500" />;
+      case "json":
+        return <VscJson className="text-blue-500" />;
+      case "parquet":
+        return <SiApacheparquet className="text-purple-500" />;
+      case "model":
+        return <FiFile className="text-cyan-500" />;
+      default:
+        return <FiFile className="text-gray-500" />;
+    }
+  };
+
+  const renderFileItem = (item: any, key: string, path: string, level: number = 0) => {
+    const isExpanded = expandedFolders.has(path);
+    const isSelected = selectedFile === key;
+    const hasChildren = item.type === "folder" && item.children && Object.keys(item.children).length > 0;
+
+    return (
+      <div key={key} className="mb-1">
+        <div
+          className={`flex items-center px-3 py-2 rounded-lg cursor-pointer
+            ${isSelected ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-800"}
+          `}
+          style={{ paddingLeft: `${level * 16 + 12}px` }}
+          onClick={() => {
+            setSelectedFile(key);
+            if (hasChildren) {
+              toggleFolder(path);
+            }
+          }}
+        >
+          {hasChildren && (
+            <span className="mr-2 text-gray-400">
+              {isExpanded ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              )}
+            </span>
+          )}
+          <span className="mr-2">{getFileIcon(item.type)}</span>
+          <span className="text-sm font-medium">{item.name}</span>
+        </div>
+        {isExpanded && hasChildren && (
+          <div>
+            {Object.entries(item.children).map(([childKey, childItem]: [string, any]) => {
+              return renderFileItem(childItem, childKey, `${path}.${childKey}`, level + 1);
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-600">Đang tải...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 bg-gray-50">
+      <div className="flex h-full">
+        {/* Left sidebar - File explorer */}
+        <div className="w-64 bg-white border-r border-gray-200 p-4 h-full overflow-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-gray-900">Explorer</h2>
+            <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100">
+              <FiPlus />
+            </button>
+          </div>
+
+          <div>
+            {Object.entries(folderStructure).map(([key, item]: [string, any]) => {
+              return renderFileItem(item, key, key);
+            })}
+          </div>
+        </div>
+
+        {/* Main content area */}
+        <div className="flex-1 flex flex-col">
+          {/* Tab bar */}
+          <div className="bg-white border-b border-gray-200 flex items-center px-4">
+            <div 
+              className={`px-4 py-3 border-b-2 font-medium text-sm cursor-pointer
+                ${activeTab === "notebook" 
+                  ? "border-blue-500 text-blue-600" 
+                  : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"}`}
+              onClick={() => setActiveTab("notebook")}
+            >
+              Notebook
+            </div>
+            <div 
+              className={`px-4 py-3 border-b-2 font-medium text-sm cursor-pointer
+                ${activeTab === "terminal" 
+                  ? "border-blue-500 text-blue-600" 
+                  : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"}`}
+              onClick={() => setActiveTab("terminal")}
+            >
+              Terminal
+            </div>
+            <div 
+              className={`px-4 py-3 border-b-2 font-medium text-sm cursor-pointer
+                ${activeTab === "data" 
+                  ? "border-blue-500 text-blue-600" 
+                  : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"}`}
+              onClick={() => setActiveTab("data")}
+            >
+              Data
+            </div>
+          </div>
+
+          {/* Notebook content */}
+          {activeTab === "notebook" && (
+            <div className="flex-1 p-6 bg-white">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center">
+                  <SiJupyter className="text-orange-500 mr-2" size={24} />
+                  <h2 className="text-lg font-semibold">Phân tích dữ liệu.ipynb</h2>
+                </div>
+                <div className="flex space-x-2">
+                  <button className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 flex items-center gap-1.5 hover:bg-gray-50 transition-all shadow-sm">
+                    <FiSave size={14} />
+                    <span>Lưu</span>
+                  </button>
+                  <button className="px-3 py-1.5 bg-blue-500 rounded-lg text-sm font-medium text-white flex items-center gap-1.5 hover:bg-blue-600 transition-all shadow-sm">
+                    <FiPlay size={14} />
+                    <span>Chạy</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="border border-gray-200 rounded-xl p-4 mb-4">
+                <div className="bg-gray-100 p-2 rounded-lg mb-3 text-sm font-mono">
+                  # Notebook Python
+                </div>
+                <div className="bg-gray-100 p-2 rounded-lg text-sm font-mono">
+                  print("Xin chào DataBricks!")
+                </div>
+              </div>
+
+              <div className="border border-gray-200 rounded-xl p-4 mb-4">
+                <div className="bg-gray-100 p-2 rounded-lg mb-3 text-sm font-mono">
+                  # Import thư viện
+                </div>
+                <div className="bg-gray-100 p-2 rounded-lg mb-1 text-sm font-mono">
+                  import pandas as pd
+                </div>
+                <div className="bg-gray-100 p-2 rounded-lg mb-1 text-sm font-mono">
+                  import numpy as np
+                </div>
+                <div className="bg-gray-100 p-2 rounded-lg text-sm font-mono">
+                  import matplotlib.pyplot as plt
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Terminal content */}
+          {activeTab === "terminal" && (
+            <div className="flex-1 p-6">
+              <div className="mb-4 flex items-center">
+                <FiTerminal className="text-gray-700 mr-2" size={24} />
+                <h2 className="text-lg font-semibold">Terminal</h2>
+              </div>
+              <div className="bg-gray-900 text-gray-100 rounded-xl p-4 font-mono text-sm h-96 overflow-auto">
+                <div>$ python --version</div>
+                <div>Python 3.9.12</div>
+                <div>$ pip list</div>
+                <div>Package         Version</div>
+                <div>--------------- -------</div>
+                <div>numpy           1.22.3</div>
+                <div>pandas          1.4.2</div>
+                <div>matplotlib      3.5.1</div>
+                <div>scikit-learn    1.0.2</div>
+                <div>$ _</div>
+              </div>
+            </div>
+          )}
+
+          {/* Data content */}
+          {activeTab === "data" && (
+            <div className="flex-1 p-6">
+              <div className="mb-4 flex items-center">
+                <BiData className="text-green-600 mr-2" size={24} />
+                <h2 className="text-lg font-semibold">Data Explorer - sales_data.csv</h2>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sản phẩm</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Giá</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số lượng</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {[...Array(5)].map((_, i) => (
+                      <tr key={i} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">10{i+1}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Sản phẩm {i+1}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{(i+1)*50}.000đ</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{i+5}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-08-{20+i}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

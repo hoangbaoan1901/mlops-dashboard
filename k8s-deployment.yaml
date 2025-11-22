@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: workspace-manager
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: wm-backend
+    namespace: workspace-manager
+    labels:
+        app: wm-backend
+spec:
+    selector:
+        app: wm-backend
+    ports:
+        - port: 3000
+          targetPort: 3000
+          nodePort: 30300
+    type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: wm-backend
+    namespace: workspace-manager
+    labels:
+        app: wm-backend
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: wm-backend
+    template:
+        metadata:
+            labels:
+                app: wm-backend
+        spec:
+            containers:
+                - name: wm-backend
+                  image: hoangbaoan1901/wm-backend:latest
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                      - containerPort: 3000
+                  env:
+                      - name: PORT
+                        value: "3000"
+                      - name: NODE_ENV
+                        value: "production"
+                      - name: DATABASE_URL
+                        value: "postgresql://postgres:postgres@192.168.1.21:5432/mlops"
+                      - name: KEYCLOAK_AUTH_SERVER_URL
+                        value: "http://192.168.1.21:30080"
+                      - name: KEYCLOAK_REALM
+                        value: "disops"
+                      - name: KEYCLOAK_CLIENT_ID
+                        value: "disops-backend"
+                      - name: KEYCLOAK_CLIENT_SECRET
+                        value: "3BE51odVnILFMV1BVb7MEnNrJSLpICpg"
+                      - name: CODER_URL
+                        value: "http://192.168.1.21:30100"
+                      - name: CODER_ADMIN_EMAIL
+                        value: "admin@example.com"
+                      - name: CODER_ADMIN_PASSWORD
+                        value: "Admin@Example.com"
+                      - name: FRONTEND_URL
+                        value: "http://192.168.1.21:30380"
+                      - name: MLFLOW_URL
+                        value: "http://192.168.1.21:30050"
+                      - name: MLFLOW_ADMIN_ACCOUNT
+                        value: "admin"
+                      - name: MLFLOW_ADMIN_PASSWORD
+                        value: "admin_password"
+                      - name: HOSTNAME
+                        value: "http://192.168.1.21:30300"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: wm-frontend
+    namespace: workspace-manager
+    labels:
+        app: wm-frontend
+spec:
+    selector:
+        app: wm-frontend
+    ports:
+        - port: 80
+          targetPort: 80
+          nodePort: 30380
+    type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: wm-frontend
+    namespace: workspace-manager
+    labels:
+        app: wm-frontend
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: wm-frontend
+    template:
+        metadata:
+            labels:
+                app: wm-frontend
+        spec:
+            containers:
+                - name: wm-frontend
+                  image: hoangbaoan1901/wm-frontend:latest
+                  imagePullPolicy: Always
+                  ports:
+                      - containerPort: 80
+                  env:
+                      - name: VITE_API_URL
+                        value: "http://192.168.1.21:30300"
+                      - name: VITE_KEYCLOAK_URL
+                        value: "http://192.168.1.21:30080"
+                      - name: VITE_KEYCLOAK_REALM
+                        value: "disops"
+                      - name: VITE_KEYCLOAK_CLIENTID
+                        value: "disops"

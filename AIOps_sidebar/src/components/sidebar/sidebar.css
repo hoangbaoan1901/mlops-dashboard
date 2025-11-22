@@ -1,0 +1,66 @@
+.sidebar-container .ant-menu-item,
+.sidebar-container .ant-menu-submenu-title {
+  height: 60px !important;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.sidebar-container .ant-menu-item svg {
+  min-width: 25px !important;
+}
+.sidebar-container .ant-menu-title-content {
+  display: block;
+}
+.sidebar-container .sidebar-menu.collapsed {
+  .ant-menu-item {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .ant-menu-title-content {
+      display: none;
+    }
+  }
+
+  .ant-menu-submenu-vertical {
+    .ant-menu-submenu-title {
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ant-menu-title-content {
+      display: none;
+    }
+  }
+}
+
+/* Active menu item styling */
+.ant-menu-item-selected {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+  border-radius: 4px !important;
+}
+
+.ant-menu-item-selected .ant-menu-title-content {
+  color: #1890ff !important;
+}
+
+.ant-menu-item-selected svg {
+  color: #1890ff !important;
+}
+
+/* For submenu items */
+.ant-menu-submenu-selected > .ant-menu-submenu-title {
+  color: #1890ff !important;
+}
+
+.ant-menu-submenu-selected > .ant-menu-submenu-title svg {
+  color: #1890ff !important;
+}
+
+/* Add hover effect */
+.ant-menu-item:hover,
+.ant-menu-submenu-title:hover {
+  background-color: rgba(24, 144, 255, 0.05) !important;
+  color: #1890ff !important;
+}

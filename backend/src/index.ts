@@ -12,7 +12,11 @@ app.use(morgan("dev"));
 // Enable CORS
 app.use(
     cors({
-        origin: ["http://localhost:3000", "http://localhost:5173"],
+        origin: [
+            process.env.FRONTEND_URL || "http://localhost:5173",
+            process.env.CODER_URL || "http://localhost:30100",
+            process.env.KEYCLOAK_URL || "http://localhost:30080",
+        ],
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
